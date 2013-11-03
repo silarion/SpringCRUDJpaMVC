@@ -1,6 +1,7 @@
 package com.intech.test;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -13,6 +14,8 @@ import org.springframework.core.GenericTypeResolver;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+
+import com.intech.model.Copyright;
 
 public class ApplicationListener implements
 		org.springframework.context.ApplicationListener<ContextRefreshedEvent> {
@@ -60,7 +63,7 @@ public class ApplicationListener implements
 
 			if (hasRepository) {
 				// System.out.println("ok " + modelClass + "(" + + ")");
-			} else {
+			} else if (false) {
 				// System.out.println("nok " + modelClass);
 
 				// creation du JpaRepository
@@ -85,6 +88,33 @@ public class ApplicationListener implements
 
 			}
 
+		}
+		System.out.println("**********************************");
+
+		// registerGenericControllers(event);
+	}
+
+	private void registerGenericControllers(ContextRefreshedEvent event) {
+		AnnotationConfigWebApplicationContext ctx = (AnnotationConfigWebApplicationContext) event
+				.getApplicationContext();
+
+		EntityManagerFactory entityManagerFactory = ctx
+				.getBean(EntityManagerFactory.class);
+
+		System.out.println("**********************************");
+		System.out.println("***** Controllers *****");
+		for (Entry<String, CRUDController> bean : ctx.getBeansOfType(
+				CRUDController.class).entrySet()) {
+			System.out.println(bean.getKey());
+		}
+
+		ctx.getBeanFactory().registerSingleton("copyrightController",
+				new CRUDController(Copyright.class));
+
+		System.out.println("------------------------------------");
+		for (Entry<String, CRUDController> bean : ctx.getBeansOfType(
+				CRUDController.class).entrySet()) {
+			System.out.println(bean.getKey());
 		}
 		System.out.println("**********************************");
 	}

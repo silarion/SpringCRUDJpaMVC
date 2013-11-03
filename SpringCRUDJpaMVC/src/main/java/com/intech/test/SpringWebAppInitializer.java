@@ -15,11 +15,18 @@ public class SpringWebAppInitializer implements WebApplicationInitializer {
 		System.out
 				.println("************************************ Startup via SpringWebAppInitializer");
 		AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();
+		appContext.addApplicationListener(new ApplicationListener());
 		appContext.register(JpaConfiguration.class);
-		appContext.register(JpaConfiguration2.class);
+		appContext.refresh();
+
+		AnnotationConfigWebApplicationContext webContext = new AnnotationConfigWebApplicationContext();
+		webContext.setParent(appContext);
+		// webContext.addBeanFactoryPostProcessor(appContext
+		// .getBean(ControllersDefinitions.class));
+		webContext.register(WebConfiguration.class);
 
 		ServletRegistration.Dynamic dispatcher = container.addServlet(
-				"SpringDispatcher", new DispatcherServlet(appContext));
+				"SpringDispatcher", new DispatcherServlet(webContext));
 		dispatcher.setLoadOnStartup(1);
 		dispatcher.addMapping("/");
 

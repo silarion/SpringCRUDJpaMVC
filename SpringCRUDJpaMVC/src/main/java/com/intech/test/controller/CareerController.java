@@ -1,7 +1,6 @@
 package com.intech.test.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,16 +26,13 @@ public class CareerController extends CRUDController<Career, Integer> {
 	@Autowired
 	private CareerResourceAssembler careerResourceAssembler;
 
-	// @Autowired
-	// @Qualifier("armorRepository")
-	// private SimpleJpaRepository<Armor, Integer> armorRepository;
+	// @Override
+	// protected JpaRepository<Career, Integer> getRepository(String
+	// domainClassName) {
+	// return careerRepository;
+	// }
 
-	@Override
-	protected JpaRepository<Career, Integer> getRepository() {
-		return careerRepository;
-	}
-
-	@RequestMapping(value = "/{careerId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/show/{careerId}", method = RequestMethod.GET)
 	@ResponseBody
 	public CareerResource getCareer(@PathVariable("careerId") int careerId) {
 		return careerResourceAssembler.toResource(careerRepository
@@ -45,7 +41,7 @@ public class CareerController extends CRUDController<Career, Integer> {
 
 	@RequestMapping("/get/{careerId}")
 	public Career findAllView(Model model, @PathVariable Integer careerId) {
-		return getRepository().findOne(careerId);
+		return careerRepository.findOne(careerId);
 	}
 
 	// @RequestMapping("/{id}")

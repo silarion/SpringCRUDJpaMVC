@@ -6,10 +6,6 @@
 
 	<persistence-unit name="application" transaction-type="RESOURCE_LOCAL">
 
-        <class>com.intech.test.Item</class>
-        <class>com.intech.test.Order</class>
-		
-		
 		<class>com.intech.model.Administrateur</class>
 		<class>com.intech.model.AgeSkill</class>
 		<class>com.intech.model.AgeSkillPK</class>
