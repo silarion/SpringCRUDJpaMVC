@@ -37,10 +37,9 @@ public class MyHandlerMapping extends RequestMappingHandlerMapping {
 				(String) handler, CRUDController.class);
 		Class domainClass = ctrl.getDomainClass();
 
-		PatternsRequestCondition newPattern = mapping.getPatternsCondition()
-				.combine(
-						new PatternsRequestCondition(domainClass
-								.getSimpleName().toLowerCase()));
+		PatternsRequestCondition newPattern = new PatternsRequestCondition(
+				domainClass.getSimpleName().toLowerCase()).combine(mapping
+				.getPatternsCondition());
 
 		mapping = new RequestMappingInfo(newPattern,
 				mapping.getMethodsCondition(), mapping.getParamsCondition(),
