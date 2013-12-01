@@ -16,6 +16,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @EnableJpaRepositories
+@MyEnableJpaRepositories(basePackages = "com.intech.model")
 public class JpaConfiguration {
 
 	@Bean

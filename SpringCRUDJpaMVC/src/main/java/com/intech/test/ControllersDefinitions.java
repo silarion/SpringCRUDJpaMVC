@@ -14,7 +14,9 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
+import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 
 public class ControllersDefinitions implements ImportBeanDefinitionRegistrar {
 
@@ -63,8 +65,11 @@ public class ControllersDefinitions implements ImportBeanDefinitionRegistrar {
 
 				// definition du Controller
 				builder = BeanDefinitionBuilder
-						.rootBeanDefinition(CRUDController.class);
+						.genericBeanDefinition(CRUDController.class);
 				builder.addConstructorArgValue(modelClass);
+				builder.addPropertyReference("repository",
+						getRepository(modelClass, registry));
+
 				// builder.addPropertyValue("repository", value);
 
 				// ajout definition du Jparepository
@@ -83,7 +88,7 @@ public class ControllersDefinitions implements ImportBeanDefinitionRegistrar {
 				registry.registerBeanDefinition(modelClass.getSimpleName()
 						.toLowerCase() + "Controller",
 						builder.getBeanDefinition());
-				System.out.println("Creation Controller " + modelClass);
+				// System.out.println("Creation Controller " + modelClass);
 			}
 
 		}
@@ -115,7 +120,7 @@ public class ControllersDefinitions implements ImportBeanDefinitionRegistrar {
 							CRUDController.class)[0];
 					if (modelClass == c2) {
 						System.out.println("Controller deja present pour "
-								+ modelClass);
+								+ modelClass + " : " + s + " (" + c + ")");
 						return true;
 					}
 				}
@@ -123,6 +128,61 @@ public class ControllersDefinitions implements ImportBeanDefinitionRegistrar {
 
 		}
 		return false;
+	}
+
+	@SuppressWarnings("rawtypes")
+	private String getRepository(Class modelClass,
+			DefaultListableBeanFactory registry) {
+		for (String s : registry.getBeanDefinitionNames()) {
+			// System.out.println(s);
+			BeanDefinition def = registry.getBeanDefinition(s);
+			String className = def.getBeanClassName();
+			if (className != null) {
+
+				if (className.equals(JpaRepositoryFactoryBean.class.getName())) {
+					className = (String) def.getPropertyValues()
+							.getPropertyValue("repositoryInterface").getValue();
+
+					Class c = null;
+					try {
+						c = Class.forName(className);
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					}
+					for (Class interf : c.getInterfaces()) {
+						if (interf != null
+								&& JpaRepository.class.isAssignableFrom(interf)) {
+							Class c2 = GenericTypeResolver
+									.resolveTypeArguments(c,
+											JpaRepository.class)[0];
+							if (modelClass == c2) {
+								return s;
+							}
+						}
+					}
+				}
+
+				if (className
+						.equals(MyJpaRepositoryFactoryBean.class.getName())) {
+					className = (String) def.getPropertyValues()
+							.getPropertyValue("repositoryInterface").getValue();
+
+					Class c = null;
+					try {
+						c = Class.forName(className);
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					}
+					if (c == modelClass) {
+						return s;
+					}
+				}
+
+			}
+
+		}
+
+		return null;
 	}
 
 }

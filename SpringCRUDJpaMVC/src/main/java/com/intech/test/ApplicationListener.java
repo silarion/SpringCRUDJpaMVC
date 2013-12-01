@@ -9,6 +9,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.Metamodel;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -32,7 +33,8 @@ public class ApplicationListener implements
 		System.out.println("**********************************");
 		System.out.println("ctx.getBeanDefinitionNames()");
 		for (String s : ctx.getBeanDefinitionNames()) {
-			System.out.println(s);
+			BeanDefinition def = ctx.getBeanFactory().getBeanDefinition(s);
+			System.out.println(s + "          (" + def + ")");
 		}
 		System.out.println("**********************************");
 

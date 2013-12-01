@@ -37,6 +37,7 @@ public class CRUDController<T, ID extends Serializable> {
 	@PersistenceContext
 	private EntityManager em;
 
+	@Autowired
 	protected JpaRepository<T, ID> repository;
 
 	public CRUDController() {
