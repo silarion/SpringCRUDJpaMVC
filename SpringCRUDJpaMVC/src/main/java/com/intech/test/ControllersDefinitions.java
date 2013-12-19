@@ -67,6 +67,7 @@ public class ControllersDefinitions implements ImportBeanDefinitionRegistrar {
 				builder = BeanDefinitionBuilder
 						.genericBeanDefinition(CRUDController.class);
 				builder.addConstructorArgValue(modelClass);
+
 				builder.addPropertyReference("repository",
 						getRepository(modelClass, registry));
 

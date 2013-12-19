@@ -6,18 +6,17 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.RepositoryInformation;
 import org.springframework.data.repository.core.RepositoryMetadata;
-import org.springframework.data.repository.core.support.AnnotationRepositoryMetadata;
-import org.springframework.data.repository.core.support.DefaultRepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryProxyPostProcessor;
 import org.springframework.util.Assert;
 
 public class MyJpaRepositoryFactory extends JpaRepositoryFactory {
 
-	private final List<RepositoryProxyPostProcessor> postProcessors = new ArrayList<RepositoryProxyPostProcessor>();
+	private List<RepositoryProxyPostProcessor> myPostProcessors = new ArrayList<RepositoryProxyPostProcessor>();
 	private ClassLoader classLoader = org.springframework.util.ClassUtils
 			.getDefaultClassLoader();
 
@@ -48,10 +47,10 @@ public class MyJpaRepositoryFactory extends JpaRepositoryFactory {
 		// Create proxy
 		ProxyFactory result = new ProxyFactory();
 		result.setTarget(target);
-		result.setInterfaces(new Class[] { repositoryInterface,
+		result.setInterfaces(new Class[] { JpaRepository.class,
 				Repository.class });
 
-		for (RepositoryProxyPostProcessor processor : postProcessors) {
+		for (RepositoryProxyPostProcessor processor : myPostProcessors) {
 			processor.postProcess(result);
 		}
 
@@ -63,22 +62,29 @@ public class MyJpaRepositoryFactory extends JpaRepositoryFactory {
 
 	RepositoryMetadata getRepositoryMetadata(Class<?> repositoryInterface) {
 		// TODO
-		return Repository.class.isAssignableFrom(repositoryInterface) ? new DefaultRepositoryMetadata(
-				repositoryInterface) : new AnnotationRepositoryMetadata(
-				repositoryInterface);
+		return new MyRepositoryMetadata(repositoryInterface);
 	}
 
 	@Override
 	public void addRepositoryProxyPostProcessor(
 			RepositoryProxyPostProcessor processor) {
 		Assert.notNull(processor);
-		this.postProcessors.add(processor);
+		if (this.myPostProcessors == null) {
+			this.myPostProcessors = new ArrayList<RepositoryProxyPostProcessor>();
+		}
+		this.myPostProcessors.add(processor);
 	}
 
 	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.classLoader = classLoader == null ? org.springframework.util.ClassUtils
 				.getDefaultClassLoader() : classLoader;
+	}
+
+	protected RepositoryInformation getRepositoryInformation(
+			RepositoryMetadata metadata, Class<?> customImplementationClass) {
+		return new MyRepositoryInformation(metadata,
+				getRepositoryBaseClass(metadata), customImplementationClass);
 	}
 
 	// @Override

@@ -49,6 +49,7 @@ public class CRUDController<T, ID extends Serializable> {
 		this.domainClass = domainClass;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected JpaRepository<T, ID> getRepository() {
 		// TODO - chercher si un repo n'existe pas deja dans spring pour ce
 		// domainclassname
@@ -157,6 +158,10 @@ public class CRUDController<T, ID extends Serializable> {
 
 	public void setDomainClass(Class domainClass) {
 		this.domainClass = domainClass;
+	}
+
+	public void setRepository(JpaRepository<T, ID> repository) {
+		this.repository = repository;
 	}
 
 }
